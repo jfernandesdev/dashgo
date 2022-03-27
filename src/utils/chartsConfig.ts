@@ -48,6 +48,7 @@ export const options: ApexOptions = {
       opacityTo: 0.3,
     },
   },
+  colors: [theme.colors.pink[500]],
 }
 
 export const series = [{ name: 'serie1', data: [31, 120, 10, 28, 61, 18, 109] }]
