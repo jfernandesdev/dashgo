@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import { useQuery } from 'react-query'
 import Head from 'next/head'
 import {
   Box,
@@ -20,6 +19,8 @@ import {
 } from '@chakra-ui/react'
 import Link from 'next/link'
 
+import { useUsers } from '../../services/hooks/useUsers'
+
 import { Header } from '../../components/Header'
 import { Sidebar } from '../../components/Sidebar'
 import { Pagination } from '../../components/Pagination'
@@ -27,27 +28,7 @@ import { Pagination } from '../../components/Pagination'
 import { RiAddLine, RiPencilLine } from 'react-icons/ri'
 
 export default function UserList() {
-  const { data, isLoading, isFetching, error } = useQuery('users', async () => {
-    const response = await fetch('http://localhost:3000/api/users')
-    const data = await response.json()
-
-    const users = data.users.map(user => {
-      return {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        createdAt: new Date(user.createdAt).toLocaleDateString('pt-BR', {
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric'
-        })
-      };
-    });
-    
-    return users;
-  }, {
-    staleTime: 1000 * 5, //5s
-  })
+  const { data, isLoading, isFetching, error } = useUsers();
 
   const isWideVersion = useBreakpointValue({
     base: false,
@@ -76,27 +57,18 @@ export default function UserList() {
                 {!isLoading && isFetching && <Spinner size='sm' color='gray.500' ml='4' />}
               </Heading>
 
-              <Button
-                size='sm'
-                font-size='sm'
-                colorScheme='gray.500'
-                cursor='pointer'
-              >
-                Atualizar
-              </Button>
-            
-            <Link href='/users/create' passHref>
-                <Button
-                  as='a'
-                  size='sm'
-                  fontSize='sm'
-                  colorScheme='pink'
-                  cursor='pointer'
-                  leftIcon={<Icon as={RiAddLine} fontSize='20' />}
-                >
-                  Criar novo
-                </Button>
-            </Link>
+              <Link href='/users/create' passHref>
+                  <Button
+                    as='a'
+                    size='sm'
+                    fontSize='sm'
+                    colorScheme='pink'
+                    cursor='pointer'
+                    leftIcon={<Icon as={RiAddLine} fontSize='20' />}
+                  >
+                    Criar novo
+                  </Button>
+              </Link>
             </Flex>
 
            { isLoading ? (
