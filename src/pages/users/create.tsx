@@ -19,6 +19,10 @@ import { Header } from '../../components/Header'
 import { Sidebar } from '../../components/Sidebar'
 import { Input } from '../../components/Form/Input'
 
+import { useMutation } from 'react-query'
+import { api } from '../../services/api'
+import { queryClient } from '../../services/queryClient'
+
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -42,20 +46,37 @@ const createUserFormSchema = yup.object().shape({
 })
 
 export default function CreateUser() {
-  const { register, handleSubmit, reset, formState } = useForm({
+  const createUser = useMutation(async (user: CreateUserFormData) => {
+    const res = await api.post('users', {
+      user: {
+        ...user,
+        created_at: new Date(),
+      }
+    })
+
+    return res.data.user
+  }, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('users')
+    }
+  })
+
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<CreateUserFormData>({
     resolver: yupResolver(createUserFormSchema),
   })
 
-  const { errors } = formState;
 
   const handleCreateUser: SubmitHandler<CreateUserFormData> = async values => {
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    const response = await createUser.mutateAsync(values)
 
-    toast.success('Usuário criado com sucesso!', {
-      position: "bottom-right",
-      theme: 'dark'
-    });
+    if(response) {
+      toast.success('Usuário criado com sucesso!', {
+        position: "bottom-right",
+        theme: 'dark'
+      });
+    }
 
+    console.log(response)
     console.log(values)
     reset();
   }
@@ -132,7 +153,7 @@ export default function CreateUser() {
                 <Button
                   type='submit'
                   colorScheme='pink'
-                  isLoading={formState.isSubmitting}
+                  isLoading={isSubmitting}
                 >
                   Salvar
                 </Button>

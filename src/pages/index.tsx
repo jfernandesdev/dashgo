@@ -20,7 +20,11 @@ const signInFormSchema = yup.object().shape({
 
 export default function SignIn() {
   const { register, handleSubmit, formState } = useForm({
-    resolver: yupResolver(signInFormSchema)
+    resolver: yupResolver(signInFormSchema),
+    defaultValues: {
+      email: 'teste@teste.com',
+      password: '123456'
+    }
   })
   const { errors } = formState
   const router = useRouter();
